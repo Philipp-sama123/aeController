@@ -15,6 +15,8 @@ public class PlayerManager : CharacterManager {
     public bool isSprinting;
     public bool isGrounded;
     public bool addRootMotionVelocity;
+
+    public bool isInAir;
     // public bool canDoCombo;
     // public bool isUsingRightHand;
     // public bool isUsingLeftHand;
@@ -37,17 +39,17 @@ public class PlayerManager : CharacterManager {
         _playerLocomotion.HandleJumping();
         _playerLocomotion.HandleRollingAndSprinting();
 
+        _animatorManager.animator.SetBool(_animatorManager.IsInAir, isInAir);
         isUsingRootMotion = _animatorManager.animator.GetBool(_animatorManager.IsUsingRootMotion);
-        addRootMotionVelocity = _animatorManager.animator.GetBool(_animatorManager.AddRootMotionVelocity);
+        // addRootMotionVelocity = _animatorManager.animator.GetBool(_animatorManager.AddRootMotionVelocity);
     }
 
     private void FixedUpdate()
     {
         float deltaTime = Time.deltaTime;
 
-        _playerLocomotion.HandleFalling();
         _playerLocomotion.HandleMovement();
-        _playerLocomotion.CheckIfGrounded(deltaTime);
+        _playerLocomotion.HandleFalling(deltaTime, _playerLocomotion.moveDirection);
 
         _playerLocomotion.HandleRotation(deltaTime);
 

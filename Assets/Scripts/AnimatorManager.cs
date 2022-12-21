@@ -5,8 +5,8 @@ public class AnimatorManager : MonoBehaviour {
     private PlayerManager _playerManager;
     private PlayerLocomotion _playerLocomotion;
     public int IsUsingRootMotion { get; } = Animator.StringToHash("IsUsingRootMotion");
-    public int AddRootMotionVelocity { get; } = Animator.StringToHash("AddRootMotionVelocity");
-    public int IsGrounded { get; } = Animator.StringToHash("IsGrounded");
+    // public int AddRootMotionVelocity { get; } = Animator.StringToHash("AddRootMotionVelocity");
+    public int IsInAir { get; } = Animator.StringToHash("IsInAir");
     private int Vertical { get; } = Animator.StringToHash("Vertical");
     private int Horizontal { get; } = Animator.StringToHash("Horizontal");
 
@@ -23,10 +23,11 @@ public class AnimatorManager : MonoBehaviour {
         animator.SetFloat(Vertical, isSprinting ? verticalMovement * 2 : verticalMovement, 0.1f, Time.deltaTime);
     }
 
-    public void PlayTargetAnimation(string targetAnimation, bool useRootMotion = false, bool addRootMotionVelocity = false)
+    public void PlayTargetAnimation(string targetAnimation, bool useRootMotion = false)
     {
+        animator.applyRootMotion = useRootMotion;
         animator.SetBool(IsUsingRootMotion, useRootMotion);
-        animator.SetBool(AddRootMotionVelocity, addRootMotionVelocity);
+        // animator.SetBool(AddRootMotionVelocity, false);
         animator.CrossFade(targetAnimation, 0.2f);
     }
 

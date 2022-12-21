@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 
 public class PlayerLocomotion : MonoBehaviour {
@@ -13,20 +12,23 @@ public class PlayerLocomotion : MonoBehaviour {
     private Camera _mainCamera;
 
     [Header("Falling")]
-    [SerializeField] private float fallingForce = 100f;
     [SerializeField] private float groundDetectionRayStartPoint = .5f;
     [SerializeField] private float minimumDistanceNeededToBeginFall = 1f;
     [SerializeField] private float groundDirectionRayDistance = 0.25f;
     [SerializeField] private LayerMask groundLayer;
-    private Vector3 normalVector;
-    private Vector3 targetPosition;
+    [SerializeField] private float fallingSpeed = 25f;
+    [SerializeField] private float leapingVelocity = 2.5f;
+    public int inAirTimer;
+
+    private Vector3 _normalVector;
+    private Vector3 _targetPosition;
 
     [Header("Movement Speeds")]
     [SerializeField] private float walkingSpeed = 2.5f;
     [SerializeField] private float runningSpeed = 5f;
     [SerializeField] private float sprintingSpeed = 7.5f;
     [SerializeField] private float rotationSpeed = 5f;
-    [SerializeField] private Vector3 moveDirection;
+    [SerializeField] public Vector3 moveDirection;
 
     [Header("Jump Speeds")]
     [SerializeField] private float jumpSpeed = 100f;
@@ -77,7 +79,7 @@ public class PlayerLocomotion : MonoBehaviour {
             }
         }
 
-        Vector3 projectedVelocity = Vector3.ProjectOnPlane(moveDirection, normalVector);
+        Vector3 projectedVelocity = Vector3.ProjectOnPlane(moveDirection, _normalVector);
         rigidbody.velocity = projectedVelocity;
         _animatorManager.UpdateAnimatorValues(0, _inputManager.moveAmount, _playerManager.isSprinting);
 
@@ -107,26 +109,14 @@ public class PlayerLocomotion : MonoBehaviour {
         transform.rotation = targetRotation;
     }
 
-    public void HandleFalling()
-    {
-        if ( _playerManager.isGrounded )
-        {
-            _animatorManager.animator.SetBool(_animatorManager.IsGrounded, true);
-            return;
-        }
 
-        _animatorManager.animator.SetBool(_animatorManager.IsGrounded, false);
-        rigidbody.AddForce(Vector3.down * fallingForce, ForceMode.Acceleration);
-
-    }
 
     public void HandleJumping()
     {
         if ( _inputManager.jumpInput )
         {
-            _animatorManager.PlayTargetAnimation("JumpingFull", true,true);
+            _animatorManager.PlayTargetAnimation("JumpingFull", true);
             // rigidbody.velocity += (Vector3.up * jumpSpeed);
-            Debug.LogWarning("[ToDO]: HandleJumping properly.");
         }
     }
 
@@ -154,26 +144,59 @@ public class PlayerLocomotion : MonoBehaviour {
         }
     }
 
-    public void CheckIfGrounded(float deltaTime)
+    public void HandleFalling(float deltaTime, Vector3 movementDirection)
     {
-        RaycastHit hit;
-        Vector3 direction = moveDirection;
-        Vector3 currentPosition = transform.position;
-        Vector3 origin = currentPosition;
-        targetPosition = currentPosition;
+        _playerManager.isGrounded = false;
+        rigidbody.useGravity = true;
 
-        direction.Normalize();
+        RaycastHit hit;
+        Vector3 origin = transform.position;
         origin.y += groundDetectionRayStartPoint;
-        origin = origin + direction * groundDirectionRayDistance;
+
+        // if ( Physics.Raycast(origin, transform.forward, out hit, 0.4f) )
+        // {
+        //     movementDirection = Vector3.zero;
+        // }
+        //
+        if ( _playerManager.isInAir )
+        {
+            inAirTimer++;
+            rigidbody.AddForce(transform.forward * leapingVelocity, ForceMode.Impulse);
+            rigidbody.AddForce(Vector3.down * fallingSpeed * 9.8f * inAirTimer * deltaTime, ForceMode.Acceleration);
+        }
+
+        Vector3 dir = movementDirection;
+        dir.Normalize();
+        origin = origin + dir * groundDirectionRayDistance;
+
+        _targetPosition = transform.position;
 
         Debug.DrawRay(origin, -Vector3.up * minimumDistanceNeededToBeginFall, Color.red);
         if ( Physics.Raycast(origin, -Vector3.up, out hit, minimumDistanceNeededToBeginFall, groundLayer) )
         {
-            Vector3 hitPoint = hit.point;
-            normalVector = hit.normal;
-
-            targetPosition.y = hitPoint.y;
+            _normalVector = hit.normal;
+            Vector3 tp = hit.point;
             _playerManager.isGrounded = true;
+            _targetPosition.y = tp.y;
+
+            if ( _playerManager.isInAir )
+            {
+                if ( inAirTimer > 0.5f )
+                {
+                    Debug.Log("[Info] Landing You were in the air for " + inAirTimer);
+                    _animatorManager.PlayTargetAnimation("Landing", true);
+                    inAirTimer = 0;
+                }
+                else
+                {
+                    Debug.Log("[Info] EMPTY You were in the air for " + inAirTimer);
+                    _animatorManager.PlayTargetAnimation("Empty", false);
+                    inAirTimer = 0;
+
+                }
+
+                _playerManager.isInAir = false;
+            }
         }
         else
         {
@@ -181,16 +204,24 @@ public class PlayerLocomotion : MonoBehaviour {
             {
                 _playerManager.isGrounded = false;
             }
+
+            if ( _playerManager.isInAir == false )
+            {
+                if ( _playerManager.isUsingRootMotion == false )
+                {
+                    _animatorManager.PlayTargetAnimation("Falling", true);
+                }
+                _playerManager.isInAir = true;
+
+                Vector3 vel = rigidbody.velocity;
+                vel.Normalize();
+                rigidbody.velocity = vel * (runningSpeed / 2);
+                _playerManager.isInAir = true;
+            }
         }
-        AlignFeetToGround(deltaTime);
+
+        if ( _playerManager.isGrounded )
+            transform.position = Vector3.Lerp(transform.position, _targetPosition, deltaTime / .2f);
     }
 
-    private void AlignFeetToGround(float deltaTime)
-    {
-        if ( !_playerManager.isUsingRootMotion && _playerManager.isGrounded )
-        {
-            Debug.LogWarning("Align Feet");
-            transform.position = Vector3.Lerp(transform.position, targetPosition, deltaTime / 0.2f);
-        }
-    }
 }
