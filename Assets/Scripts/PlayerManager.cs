@@ -14,7 +14,6 @@ public class PlayerManager : CharacterManager {
     public bool isUsingRootMotion;
     public bool isSprinting;
     public bool isGrounded;
-    public bool addRootMotionVelocity;
 
     public bool isInAir;
     // public bool canDoCombo;

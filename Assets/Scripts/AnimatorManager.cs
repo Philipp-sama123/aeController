@@ -4,7 +4,9 @@ public class AnimatorManager : MonoBehaviour {
     public Animator animator;
     private PlayerManager _playerManager;
     private PlayerLocomotion _playerLocomotion;
+
     public int IsUsingRootMotion { get; } = Animator.StringToHash("IsUsingRootMotion");
+
     // public int AddRootMotionVelocity { get; } = Animator.StringToHash("AddRootMotionVelocity");
     public int IsInAir { get; } = Animator.StringToHash("IsInAir");
     private int Vertical { get; } = Animator.StringToHash("Vertical");
@@ -41,13 +43,7 @@ public class AnimatorManager : MonoBehaviour {
         Vector3 velocity = deltaPosition / delta;
 
         _playerLocomotion.rigidbody.drag = 0;
-        if ( _playerManager.addRootMotionVelocity )
-            _playerLocomotion.rigidbody.velocity += velocity;
-        else
-            _playerLocomotion.rigidbody.velocity = velocity;
-
-
-
+        _playerLocomotion.rigidbody.velocity = velocity;
     }
 
 }
