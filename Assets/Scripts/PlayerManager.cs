@@ -12,6 +12,7 @@ public class PlayerManager : CharacterManager {
 
     [Header("Player Flags")]
     public bool isUsingRootMotion;
+    // public bool addRootMotionVelocity;
     public bool isSprinting;
     public bool isGrounded;
 
@@ -39,6 +40,7 @@ public class PlayerManager : CharacterManager {
         _playerLocomotion.HandleRollingAndSprinting();
 
         _animatorManager.animator.SetBool(_animatorManager.IsInAir, isInAir);
+        
         isUsingRootMotion = _animatorManager.animator.GetBool(_animatorManager.IsUsingRootMotion);
         // addRootMotionVelocity = _animatorManager.animator.GetBool(_animatorManager.AddRootMotionVelocity);
     }

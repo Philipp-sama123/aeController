@@ -29,7 +29,7 @@ public class AnimatorManager : MonoBehaviour {
     {
         animator.applyRootMotion = useRootMotion;
         animator.SetBool(IsUsingRootMotion, useRootMotion);
-        // animator.SetBool(AddRootMotionVelocity, false);
+        // animator.SetBool(AddRootMotionVelocity, addRootMotionVelocity);
         animator.CrossFade(targetAnimation, 0.2f);
     }
 

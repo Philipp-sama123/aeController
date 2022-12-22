@@ -24,10 +24,10 @@ public class PlayerLocomotion : MonoBehaviour {
     private Vector3 _targetPosition;
 
     [Header("Movement Speeds")]
-    [SerializeField] private float walkingSpeed = 2.5f;
-    [SerializeField] private float runningSpeed = 5f;
-    [SerializeField] private float sprintingSpeed = 7.5f;
-    [SerializeField] private float rotationSpeed = 5f;
+    [SerializeField] private float walkingSpeed = 2;
+    [SerializeField] private float runningSpeed = 4f;
+    [SerializeField] private float sprintingSpeed = 8f;
+    [SerializeField] private float rotationSpeed = 10f;
     [SerializeField] public Vector3 moveDirection;
 
     [Header("Jump Speeds")]
@@ -116,7 +116,7 @@ public class PlayerLocomotion : MonoBehaviour {
         if ( _inputManager.jumpInput )
         {
             _animatorManager.PlayTargetAnimation("JumpingFull", true);
-            // rigidbody.velocity += (Vector3.up * jumpSpeed);
+            // rigidbody.AddForce(Vector3.up * jumpSpeed);
         }
     }
 
@@ -157,11 +157,11 @@ public class PlayerLocomotion : MonoBehaviour {
         // {
         //     movementDirection = Vector3.zero;
         // }
-        //
+
         if ( _playerManager.isInAir )
         {
             inAirTimer++;
-            rigidbody.AddForce(transform.forward * leapingVelocity, ForceMode.Impulse);
+            rigidbody.AddForce(Vector3.forward * leapingVelocity, ForceMode.Impulse);
             rigidbody.AddForce(Vector3.down * fallingSpeed * 9.8f * inAirTimer * deltaTime, ForceMode.Acceleration);
         }
 
@@ -209,7 +209,7 @@ public class PlayerLocomotion : MonoBehaviour {
             {
                 if ( _playerManager.isUsingRootMotion == false )
                 {
-                    _animatorManager.PlayTargetAnimation("Falling", true);
+                    _animatorManager.PlayTargetAnimation("Falling", false);
                 }
                 _playerManager.isInAir = true;
 
@@ -220,7 +220,7 @@ public class PlayerLocomotion : MonoBehaviour {
             }
         }
 
-        if ( _playerManager.isGrounded )
+        if ( _playerManager.isGrounded && !_playerManager.isUsingRootMotion)
             transform.position = Vector3.Lerp(transform.position, _targetPosition, deltaTime / .2f);
     }
 
