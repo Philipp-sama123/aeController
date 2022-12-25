@@ -7,7 +7,7 @@ public class AnimatorManager : MonoBehaviour {
 
     public int IsUsingRootMotion { get; } = Animator.StringToHash("IsUsingRootMotion");
 
-    // public int AddRootMotionVelocity { get; } = Animator.StringToHash("AddRootMotionVelocity");
+    public int AddRootMotionVelocity { get; } = Animator.StringToHash("AddRootMotionVelocity");
     public int IsInAir { get; } = Animator.StringToHash("IsInAir");
     private int Vertical { get; } = Animator.StringToHash("Vertical");
     private int Horizontal { get; } = Animator.StringToHash("Horizontal");
@@ -25,12 +25,12 @@ public class AnimatorManager : MonoBehaviour {
         animator.SetFloat(Vertical, isSprinting ? verticalMovement * 2 : verticalMovement, 0.1f, Time.deltaTime);
     }
 
-    public void PlayTargetAnimation(string targetAnimation, bool useRootMotion = false)
+    public void PlayTargetAnimation(string targetAnimation, bool useRootMotion = false, bool addRootMotionVelocity = false)
     {
         animator.applyRootMotion = useRootMotion;
         animator.SetBool(IsUsingRootMotion, useRootMotion);
-        // animator.SetBool(AddRootMotionVelocity, addRootMotionVelocity);
-        animator.CrossFade(targetAnimation, 0.2f);
+        animator.SetBool(AddRootMotionVelocity, addRootMotionVelocity);
+        animator.CrossFade(targetAnimation, 0.1f);
     }
 
     private void OnAnimatorMove()
@@ -43,7 +43,12 @@ public class AnimatorManager : MonoBehaviour {
         Vector3 velocity = deltaPosition / delta;
 
         _playerLocomotion.rigidbody.drag = 0;
-        _playerLocomotion.rigidbody.velocity = velocity;
+        
+        if ( _playerManager.addRootMotionVelocity )
+            _playerLocomotion.rigidbody.velocity += velocity;
+        else
+            _playerLocomotion.rigidbody.velocity = velocity;
+
     }
 
 }

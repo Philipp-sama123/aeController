@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class PlayerLocomotion : MonoBehaviour {
@@ -115,10 +116,11 @@ public class PlayerLocomotion : MonoBehaviour {
     {
         if ( _inputManager.jumpInput )
         {
-            _animatorManager.PlayTargetAnimation("JumpingFull", true);
-            // rigidbody.AddForce(Vector3.up * jumpSpeed);
+            _animatorManager.PlayTargetAnimation("JumpingFull", true, true);
+            StartCoroutine(AddJumpAcceleration());
         }
     }
+
 
     public void HandleRollingAndSprinting()
     {
@@ -144,7 +146,7 @@ public class PlayerLocomotion : MonoBehaviour {
         }
     }
 
-    public void HandleFalling(float deltaTime, Vector3 movementDirection)
+    public void HandleFalling(float deltaTime)
     {
         _playerManager.isGrounded = false;
         rigidbody.useGravity = true;
@@ -165,7 +167,7 @@ public class PlayerLocomotion : MonoBehaviour {
             rigidbody.AddForce(Vector3.down * fallingSpeed * 9.8f * inAirTimer * deltaTime, ForceMode.Acceleration);
         }
 
-        Vector3 dir = movementDirection;
+        Vector3 dir = moveDirection;
         dir.Normalize();
         origin = origin + dir * groundDirectionRayDistance;
 
@@ -220,7 +222,7 @@ public class PlayerLocomotion : MonoBehaviour {
             }
         }
 
-        if ( _playerManager.isGrounded && !_playerManager.isUsingRootMotion)
+        if ( _playerManager.isGrounded && !_playerManager.isUsingRootMotion )
             transform.position = Vector3.Lerp(transform.position, _targetPosition, deltaTime / .2f);
     }
 
