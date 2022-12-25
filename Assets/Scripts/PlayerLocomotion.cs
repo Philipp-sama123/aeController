@@ -32,7 +32,7 @@ public class PlayerLocomotion : MonoBehaviour {
     [SerializeField] public Vector3 moveDirection;
 
     [Header("Jump Speeds")]
-    [SerializeField] private float jumpSpeed = 100f;
+    [SerializeField] private float jumpForceMultiplier = 2f;
 
     private void Awake()
     {
@@ -49,9 +49,7 @@ public class PlayerLocomotion : MonoBehaviour {
 
     public void HandleMovement()
     {
-        //normalVector = transform.up; // ToDo !
-
-        // if ( _playerManager.isGrounded == false ) return;
+        _normalVector = transform.up; // ToDo !
         Transform mainCameraTransform = _mainCamera.transform;
         float speed = runningSpeed;
 
@@ -81,6 +79,13 @@ public class PlayerLocomotion : MonoBehaviour {
         }
 
         Vector3 projectedVelocity = Vector3.ProjectOnPlane(moveDirection, _normalVector);
+        if ( _playerManager.isGrounded == false )
+        {
+            rigidbody.velocity = projectedVelocity / 2;
+
+            // ToDo: Add Air Movement!
+            return;
+        }
         rigidbody.velocity = projectedVelocity;
         _animatorManager.UpdateAnimatorValues(0, _inputManager.moveAmount, _playerManager.isSprinting);
 
@@ -117,7 +122,7 @@ public class PlayerLocomotion : MonoBehaviour {
         if ( _inputManager.jumpInput )
         {
             _animatorManager.PlayTargetAnimation("JumpingFull", true, true);
-            StartCoroutine(AddJumpAcceleration());
+            _animatorManager.forceMultiplier = jumpForceMultiplier;
         }
     }
 
@@ -183,7 +188,7 @@ public class PlayerLocomotion : MonoBehaviour {
 
             if ( _playerManager.isInAir )
             {
-                if ( inAirTimer > 0.5f )
+                if ( inAirTimer > 25f )
                 {
                     Debug.Log("[Info] Landing You were in the air for " + inAirTimer);
                     _animatorManager.PlayTargetAnimation("Landing", true);

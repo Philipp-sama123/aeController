@@ -47,7 +47,7 @@ public class PlayerManager : CharacterManager {
 
     private void FixedUpdate()
     {
-        float deltaTime = Time.deltaTime;
+        float deltaTime = Time.fixedDeltaTime;
 
         _playerLocomotion.HandleMovement();
         _playerLocomotion.HandleFalling(deltaTime);

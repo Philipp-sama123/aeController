@@ -1168,11 +1168,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8057916934052953143, guid: ec09e7bbe058641e5a9ccbf84cc304fd, type: 3}
       propertyPath: groundDirectionRayDistance
-      value: 0.05
+      value: 0.025
       objectReference: {fileID: 0}
     - target: {fileID: 8057916934052953143, guid: ec09e7bbe058641e5a9ccbf84cc304fd, type: 3}
       propertyPath: minimumDistanceNeededToBeginFall
-      value: 0.75
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8097915663813632449, guid: ec09e7bbe058641e5a9ccbf84cc304fd, type: 3}
       propertyPath: m_Name
@@ -1497,6 +1497,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: 0}
+  forceMultiplier: 1
 --- !u!4 &267181276696631474
 Transform:
   m_ObjectHideFlags: 0
@@ -25077,7 +25078,7 @@ MonoBehaviour:
   sprintingSpeed: 8
   rotationSpeed: 10
   moveDirection: {x: 0, y: 0, z: 0}
-  jumpSpeed: 250
+  jumpForceMultiplier: 2
 --- !u!114 &6199585723412091329
 MonoBehaviour:
   m_ObjectHideFlags: 0
